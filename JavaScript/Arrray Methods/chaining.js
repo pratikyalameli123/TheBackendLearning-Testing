@@ -20,3 +20,12 @@ console.log(eigplus);
 
 //-------------------------------------------------------------------------------------------
 // Find total price of in-stock products.
+const products = [
+  { name: "Laptop", price: 1000, inStock: true },
+  { name: "Phone", price: 500, inStock: false },
+  { name: "Tablet", price: 300, inStock: true }
+];
+
+const proprice = 
+
+products.reduce((acc,nums))
