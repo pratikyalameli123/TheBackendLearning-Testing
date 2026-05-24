@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GATE CS Predictor V3</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #15151a;
+            --border: #333333;
+            --yellow: #f5c518;
+            --red: #ff4d4d;
+            --green: #4dffb0;
+            --blue: #4d94ff;
+            --text-main: #ffffff;
+            --text-muted: #aaaaaa;
+            --font-head: 'Bebas Neue', cursive;
+            --font-mono: 'Space Mono', monospace;
+            --font-body: 'DM Sans', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-image:
+                linear-gradient(rgba(245, 197, 24, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(245, 197, 24, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            color: var(--text-main);
+            font-family: var(--font-body);
+            margin: 0;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: var(--font-head);
+            letter-spacing: 1.5px;
+            margin-top: 0;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 2px solid var(--border);
+            border-top: 5px solid var(--yellow);
+            padding: 2rem;
+            position: relative;
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .card.red-top {
+            border-top-color: var(--red);
+        }
+
+        .card.green-top {
+            border-top-color: var(--green);
+        }
+
+        .card.blue-top {
+            border-top-color: var(--blue);
+        }
+
+        .badge {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: var(--yellow);
+            color: var(--bg);
+            padding: 5px 10px;
+            font-family: var(--font-mono);
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .red-top .badge {
+            background: var(--red);
+            color: white;
+        }
+
+        .green-top .badge {
+            background: var(--green);
+            color: var(--bg);
+        }
+
+        .blue-top .badge {
+            background: var(--blue);
+            color: var(--bg);
+        }
+
+        input,
+        select,
+        button {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: white;
+            font-family: var(--font-mono);
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            outline: none;
+            margin-bottom: 0.5rem;
+        }
+
+        select {
+            background: var(--bg);
+            cursor: pointer;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--yellow);
+        }
+
+        button {
+            background: var(--yellow);
+            color: var(--bg);
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: transform 0.1s, box-shadow 0.1s;
+            margin-bottom: 0;
+        }
+
+        button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px var(--text-main);
+        }
+
+        button:hover {
+            box-shadow: 4px 4px 0px var(--text-main);
+        }
+
+        .btn-green {
+            background: var(--green);
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .stats-bar {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--yellow);
+        }
+
+        .result-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-box {
+            border: 1px solid var(--border);
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-label {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--yellow);
+        }
+
+        .stat-sub {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .tier {
+            font-family: var(--font-head);
+            font-size: 2rem;
+            letter-spacing: 2px;
+        }
+
+        .confidence-container {
+            height: 8px;
+            background: var(--border);
+            width: 100%;
+            margin-top: 5px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: var(--green);
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        canvas {
+            width: 100%;
+            height: 200px;
+            background: #0d0d12;
+            border: 1px solid var(--border);
+            margin-top: 1rem;
+        }
+
+        .nn-list,
+        .offer-list {
+            margin: 0;
+            padding-left: 20px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .nn-list li span,
+        .offer-list li span {
+            color: var(--yellow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            display: block;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background: #1a1a24;
+            color: var(--yellow);
+        }
+
+        /* File Upload */
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-label {
+            display: inline-block;
+            padding: 10px;
+            border: 2px dashed var(--yellow);
+            color: var(--yellow);
+            text-align: center;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            font-family: var(--font-mono);
+            transition: background 0.2s;
+        }
+
+        .file-upload-label:hover {
+            background: rgba(245, 197, 24, 0.1);
+        }
+
+        /* AI Features */
+        .ai-box {
+            background: rgba(77, 255, 176, 0.1);
+            border: 1px solid var(--green);
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-main);
+        }
+
+        .ai-box h4 {
+            margin-top: 0;
+            color: var(--green);
+            font-family: var(--font-head);
+            letter-spacing: 1px;
+            font-size: 1.2rem;
+        }
+
+        .ai-loading {
+            color: var(--yellow);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="stats-bar" id="statsBar">
+        <div>STATUS: <span id="sysStatus" style="color:var(--red)">WAITING FOR DATA</span></div>
+        <div>QUALITY: <span id="sysQuality" style="color:var(--text-main)">N/A</span></div>
+        <div>TOTAL ENTRIES: <span id="sysCount" style="color:var(--text-main)">0</span></div>
+        <div>ENGINE: <span style="color:var(--green)">HYBRID V3</span></div>
+    </div>
+
+    <!-- Left Column: Prediction -->
+    <div class="col" style="display: flex; flex-direction: column; gap: 2rem;">
+
+        <div class="card">
+            <div class="badge">Predictor</div>
+            <h2>Predict GATE Stats</h2>
+            <div class="row">
+                <select id="inputType" style="flex: 1;">
+                    <option value="marks">From Marks</option>
+                    <option value="score">From Score</option>
+                    <option value="rank">From Rank</option>
+                </select>
+                <input type="number" id="inputValue" step="0.01" min="0" placeholder="Enter value..." style="flex: 2;">
+            </div>
+            <button onclick="executePrediction()">Calculate Everything</button>
+        </div>
+
+        <div id="resultsArea" class="card blue-top hidden">
+            <div class="badge">Results</div>
+
+            <div class="result-group">
+                <div class="stat-box">
+                    <div class="stat-label">Predicted Marks</div>
+                    <div class="stat-value" id="resMarks">--</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Predicted Score</div>
+                    <div class="stat-value" id="resScore">--</div>
+                    <div class="stat-sub" id="resScoreRng">± --</div>
+                </div>
+                <div class="stat-box" style="grid-column: 1 / -1;">
+                    <div class="stat-label">Predicted All India Rank (AIR)</div>
+                    <div class="stat-value" id="resRank" style="font-size: 2.5rem;">--</div>
+                    <div class="stat-sub" id="resRankRng">Expected Range: -- to --</div>
+                </div>
+            </div>
+
+            <div class="stat-box">
+                <div class="stat-label">Verdict & Confidence</div>
+                <div class="tier" id="resVerdict">--</div>
+                <div class="stat-sub" id="confText" style="margin-top: 10px;">Confidence Score: 0%</div>
+                <div class="confidence-container">
+                    <div class="confidence-fill" id="confBar"></div>
+                </div>
+            </div>
+
+            <div class="row" style="gap:1rem; flex-wrap: wrap;">
+                <div class="stat-box col" style="min-width: 200px;">
+                    <div class="stat-label">Nearest Neighbors (Top 3)</div>
+                    <ul class="nn-list" id="nnList"></ul>
+                </div>
+                <div class="stat-box col" style="min-width: 200px;">
+                    <div class="stat-label">Likely Offer Clusters</div>
+                    <ul class="offer-list" id="offerList"></ul>
+                </div>
+            </div>
+
+            <div>
+                <div class="stat-label">Marks vs log(Rank) Model Curve</div>
+                <canvas id="modelChart"></canvas>
+            </div>
+
+            <button id="aiBtn" class="btn-green" style="margin-top: 1.5rem;" onclick="getAIAdvice()">✨ Get AI Career
+                Strategy</button>
+            <div id="aiResult" class="hidden"></div>
+        </div>
+    </div>
+
+    <!-- Right Column: Data -->
+    <div class="col" style="display: flex; flex-direction: column; gap: 2rem;">
+
+        <div class="card red-top">
+            <div class="badge">Dataset</div>
+            <label class="file-upload-label">
+                <input type="file" id="csvFile" accept=".csv" onchange="handleCSVUpload(event)">
+                [ UPLOAD CSV DATASET ]
+            </label>
+            <div id="uploadMsg" class="stat-sub" style="margin-top: 10px;">Robust CSV Parser active. Awaiting file.
+            </div>
+        </div>
+
+        <div class="card green-top">
+            <div class="badge">Add Data</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="addName" placeholder="Name (Opt)">
+                <input type="number" id="addMarks" placeholder="Marks (Req)" step="0.01">
+                <input type="number" id="addScore" placeholder="Score (Opt)" step="1">
+                <input type="number" id="addRank" placeholder="Rank (Req)" step="1">
+                <input type="text" id="addOffer" placeholder="Offer (Opt)" style="grid-column: 1 / -1;"
+                    onkeypress="handleEnter(event)">
+            </div>
+            <button class="btn-green" onclick="addData()">Push to Dataset</button>
+        </div>
+
+        <div class="card" style="flex: 1; border-top: 5px solid var(--text-muted);">
+            <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.2rem;">Live Data Table (<span
+                    id="tableCount">0</span>)</h3>
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Marks</th>
+                        <th>Score</th>
+                        <th>Rank</th>
+                        <th>Act</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="4" style="text-align:center; padding: 2rem;">No valid data loaded.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        /** * GATE CS PREDICTOR V3 - Core Engine
+         * Architecture: Hybrid (KNN + Poly) Forward-Only Models w/ Binary Search Inversion
+         */
+
+        const apiKey = ""; // Gemini API Key
+        let D = []; // Cleaned dataset
+        let P = { score: null, rank: null }; // Poly coefficients
+
+        // --- AI GEMINI INTEGRATION ---
+
+        async function fetchWithRetry(url, options, maxRetries = 5) {
+            let delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    let response = await fetch(url, options);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return await response.json();
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    await new Promise(res => setTimeout(res, delays[i]));
+                }
+            }
+        }
+
+        async function getAIAdvice() {
+            const btn = document.getElementById('aiBtn');
+            const resBox = document.getElementById('aiResult');
+            const rank = document.getElementById('resRank').textContent;
+            const score = document.getElementById('resScore').textContent;
+            const verdict = document.getElementById('resVerdict').textContent;
+
+            let colleges = [];
+            document.querySelectorAll('#offerList li').forEach(li => {
+                if (!li.textContent.includes('No strong historical clusters')) {
+                    colleges.push(li.textContent.split('(')[0].trim());
+                }
+            });
+            let collegeText = colleges.length > 0 ? colleges.join(", ") : "None identified from current dataset.";
+
+            btn.disabled = true;
+            resBox.classList.remove('hidden');
+            resBox.innerHTML = `<div class="ai-box"><div class="ai-loading">✨ Gemini is analyzing your profile...</div></div>`;
+
+            const prompt = `You are an expert Indian engineering career counselor for GATE CS students. 
+        A student just got a predicted GATE CS Score of ${score}, an All-India Rank of ${rank}, and a verdict tier of "${verdict}". 
+        Based on historical data, their likely offer clusters are: ${collegeText}.
+        Provide a concise, encouraging 3-paragraph strategy on their next steps. Address whether they should prepare for specific M.Tech interviews, MS research interviews, PSUs, or consider a retake if the rank is low. Keep it very supportive.`;
+
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: "You are a helpful, expert GATE career advisor. Keep responses short, encouraging, and actionable without markdown headers." }] }
+                };
+
+                const data = await fetchWithRetry(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                let text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Unable to generate advice at this moment.";
+
+                // Basic HTML formatting
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                text = text.replace(/\*/g, '•');
+                text = text.replace(/\n\n/g, '<br><br>');
+                text = text.replace(/\n/g, '<br>');
+
+                resBox.innerHTML = `
+                <div class="ai-box">
+                    <h4>✨ AI Career Strategy</h4>
+                    ${text}
+                </div>
+            `;
+            } catch (e) {
+                console.error(e);
+                resBox.innerHTML = `<div class="ai-box" style="border-color: var(--red); color: var(--red);">Error connecting to AI advisor. Please try again later.</div>`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // --- MATH & STATS UTILS ---
+
+        function gaussianElimination(A, B) {
+            let n = A.length, M = A.map((row, i) => [...row, B[i]]);
+            for (let i = 0; i < n; i++) {
+                let max = i;
+                for (let j = i + 1; j < n; j++) if (Math.abs(M[j][i]) > Math.abs(M[max][i])) max = j;
+                [M[i], M[max]] = [M[max], M[i]];
+                if (Math.abs(M[i][i]) < 1e-12) continue;
+                for (let j = i + 1; j <= n; j++) M[i][j] /= M[i][i];
+                for (let j = 0; j < n; j++) {
+                    if (j !== i) {
+                        let f = M[j][i];
+                        for (let k = i; k <= n; k++) M[j][k] -= f * M[i][k];
+                    }
+                }
+            }
+            return M.map(row => row[n]);
+        }
+
+        function fitPoly2(xArr, yArr) {
+            if (xArr.length < 3) return [0, 0, 0];
+            let n = xArr.length, sX = 0, sX2 = 0, sX3 = 0, sX4 = 0, sY = 0, sXY = 0, sX2Y = 0;
+            for (let i = 0; i < n; i++) {
+                let x = xArr[i], y = yArr[i], x2 = x * x;
+                sX += x; sX2 += x2; sX3 += x2 * x; sX4 += x2 * x2;
+                sY += y; sXY += x * y; sX2Y += x2 * y;
+            }
+            return gaussianElimination([[n, sX, sX2], [sX, sX2, sX3], [sX2, sX3, sX4]], [sY, sXY, sX2Y]);
+        }
+
+        function evalPoly(c, x) { return c ? c[0] + c[1] * x + c[2] * x * x : 0; }
+
+        function getKNN(marks, k) {
+            let dists = D.map(d => ({ ...d, dist: Math.abs(d.marks - marks) }));
+            dists.sort((a, b) => a.dist - b.dist);
+            return dists.slice(0, k);
+        }
+
+        // --- V3 HYBRID PREDICTION ENGINE ---
+
+        function predictScore(marks) {
+            if (D.length === 0) return 0;
+            let polyS = evalPoly(P.score, marks);
+            let knn = getKNN(marks, 7);
+            let weightSum = 0, knnS = 0;
+            knn.forEach(n => { let w = 1 / (n.dist + 0.5); knnS += n.score * w; weightSum += w; });
+            knnS /= weightSum;
+            let minM = D[0].marks, maxM = D[D.length - 1].marks;
+            let wKnn = (marks < minM || marks > maxM) ? 0.2 : 0.6;
+            return (knnS * wKnn) + (polyS * (1 - wKnn));
+        }
+
+        function predictLogRank(marks) {
+            if (D.length === 0) return 0;
+            let polyLn = evalPoly(P.rank, marks);
+            let knn = getKNN(marks, 7);
+            let weightSum = 0, knnLn = 0;
+            knn.forEach(n => { let w = 1 / (n.dist + 0.5); knnLn += Math.log(n.rank) * w; weightSum += w; });
+            knnLn /= weightSum;
+            let minM = D[0].marks, maxM = D[D.length - 1].marks;
+            let wKnn = (marks < minM || marks > maxM) ? 0.3 : 0.65;
+            return (knnLn * wKnn) + (polyLn * (1 - wKnn));
+        }
+
+        function marksFromRank(targetRank) {
+            let targetLn = Math.log(Math.max(1, targetRank));
+            let low = -10, high = 110, mid;
+            for (let i = 0; i < 60; i++) {
+                mid = (low + high) / 2;
+                let predLn = predictLogRank(mid);
+                if (predLn > targetLn) low = mid; else high = mid;
+            }
+            return Math.max(0, Math.min(100, mid));
+        }
+
+        function marksFromScore(targetScore) {
+            let low = -10, high = 110, mid;
+            for (let i = 0; i < 60; i++) {
+                mid = (low + high) / 2;
+                let predS = predictScore(mid);
+                if (predS < targetScore) low = mid; else high = mid;
+            }
+            return Math.max(0, Math.min(100, mid));
+        }
+
+        // --- DATA PIPELINE ---
+
+        function parseCSV(text) {
+            let rows = [], row = [], inQ = false, cur = '';
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                if (c === '"' && text[i + 1] === '"') { cur += '"'; i++; }
+                else if (c === '"') inQ = !inQ;
+                else if (c === ',' && !inQ) { row.push(cur.trim()); cur = ''; }
+                else if ((c === '\n' || c === '\r') && !inQ) {
+                    if (c === '\r' && text[i + 1] === '\n') i++;
+                    row.push(cur.trim()); if (row.some(x => x)) rows.push(row);
+                    row = []; cur = '';
+                } else cur += c;
+            }
+            if (cur || row.length) { row.push(cur.trim()); if (row.some(x => x)) rows.push(row); }
+            return rows;
+        }
+
+        function handleCSVUpload(e) {
+            let file = e.target.files[0];
+            if (!file) return;
+            let r = new FileReader();
+            r.onload = (evt) => processData(parseCSV(evt.target.result));
+            r.readAsText(file);
+        }
+
+        function processData(rows) {
+            if (rows.length < 2) return;
+            let hd = rows[0].map(h => h.toLowerCase());
+            let idx = {
+                m: hd.findIndex(h => h.includes('mark')),
+                s: hd.findIndex(h => h.includes('score')),
+                r: hd.findIndex(h => h.includes('rank')),
+                o1: hd.findIndex(h => h.includes('offer') && !h.includes('research')),
+                o2: hd.findIndex(h => h.includes('research'))
+            };
+
+            if (idx.m < 0 || idx.r < 0) {
+                safeText('uploadMsg', 'ERROR: CSV missing "marks" or "rank" headers.');
+                return;
+            }
+
+            let raw = [];
+            for (let i = 1; i < rows.length; i++) {
+                let row = rows[i];
+                if (!row || row.length < 2) continue;
+                let m = parseFloat(row[idx.m]), r = parseInt(row[idx.r]), s = parseFloat(row[idx.s]);
+
+                if (isNaN(m) && !isNaN(s)) {
+                    // Use model inversion if available, else fall back to linear approx
+                    m = (D.length >= 3) ? marksFromScore(s) : (s - 5.4677) / 11.6110;
+                }
+
+                if (!isNaN(m) && !isNaN(r) && r > 0) {
+                    let off = [];
+                    if (idx.o1 >= 0 && row[idx.o1]) off.push(row[idx.o1]);
+                    if (idx.o2 >= 0 && row[idx.o2]) off.push(row[idx.o2]);
+                    raw.push({ id: Date.now() + i, marks: m, score: isNaN(s) ? null : s, rank: r, offer: off.join(' | ') });
+                }
+            }
+
+            raw.sort((a, b) => a.marks - b.marks);
+            D = [];
+            for (let i = 0; i < raw.length; i++) {
+                let start = Math.max(0, i - 5), end = Math.min(raw.length, i + 6);
+                let window = raw.slice(start, end).map(x => Math.log(x.rank)).sort((a, b) => a - b);
+                let medianLn = window[Math.floor(window.length / 2)];
+                if (Math.abs(Math.log(raw[i].rank) - medianLn) < 1.5) D.push(raw[i]);
+            }
+
+            if (D.length > 0) safeText('uploadMsg', `SUCCESS: Loaded ${D.length} cleaned entries from CSV.`);
+            trainModels();
+        }
+
+        function handleEnter(e) { if (e.key === 'Enter') addData(); }
+
+        function addData() {
+            let m = parseFloat(document.getElementById('addMarks').value);
+            let r = parseFloat(document.getElementById('addRank').value);
+            let s = parseFloat(document.getElementById('addScore').value);
+            let o = document.getElementById('addOffer').value || '';
+
+            if (isNaN(m) && !isNaN(s)) {
+                // Use model inversion if available, else fall back to linear approx
+                m = (D.length >= 3) ? marksFromScore(s) : (s - 5.4677) / 11.6110;
+            }
+
+            if (isNaN(m) || isNaN(r)) return alert("Marks (or Score) and Rank are required.");
+
+            D.push({ id: Date.now(), marks: m, score: isNaN(s) ? null : s, rank: r, offer: o });
+
+            document.getElementById('addMarks').value = '';
+            document.getElementById('addRank').value = '';
+            document.getElementById('addScore').value = '';
+            document.getElementById('addName').value = '';
+            document.getElementById('addOffer').value = '';
+
+            trainModels();
+        }
+
+        function deleteEntry(id) {
+            D = D.filter(d => d.id !== id);
+            trainModels();
+        }
+
+        function trainModels() {
+            if (D.length < 3) {
+                safeText('sysStatus', 'INSUFFICIENT DATA');
+                document.getElementById('sysStatus').style.color = 'var(--red)';
+                renderTable();
+                return;
+            }
+
+            D.sort((a, b) => a.marks - b.marks);
+
+            let sData = D.filter(d => d.score !== null);
+            P.score = fitPoly2(sData.map(d => d.marks), sData.map(d => d.score));
+            P.rank = fitPoly2(D.map(d => d.marks), D.map(d => Math.log(d.rank)));
+
+            safeText('sysStatus', 'ONLINE'); document.getElementById('sysStatus').style.color = 'var(--green)';
+            safeText('sysCount', D.length);
+            document.getElementById('tableCount').textContent = D.length;
+
+            let density = D.length / Math.max(1, (D[D.length - 1].marks - D[0].marks));
+            let q = density > 10 ? 'A+ (Dense)' : density > 3 ? 'B (Good)' : 'C (Sparse)';
+            safeText('sysQuality', q);
+
+            renderTable();
+            drawChart();
+        }
+
+        // --- DOM SAFE RENDERERS ---
+
+        function safeText(id, text) { document.getElementById(id).textContent = text; }
+
+        function renderTable() {
+            let tb = document.querySelector('#dataTable tbody');
+            tb.innerHTML = '';
+            if (D.length === 0) {
+                tb.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 2rem;">No valid data loaded.</td></tr>`;
+                return;
+            }
+            D.slice(0, 100).forEach(d => {
+                let tr = document.createElement('tr');
+
+                let tdm = document.createElement('td'); tdm.textContent = d.marks.toFixed(2); tr.appendChild(tdm);
+                let tds = document.createElement('td'); tds.textContent = d.score ? Math.round(d.score) : '-'; tr.appendChild(tds);
+                let tdr = document.createElement('td'); tdr.textContent = d.rank; tr.appendChild(tdr);
+
+                let tda = document.createElement('td');
+                let btn = document.createElement('button');
+                btn.textContent = '[X]';
+                btn.style.background = 'transparent';
+                btn.style.border = 'none';
+                btn.style.color = 'var(--red)';
+                btn.style.padding = '0';
+                btn.onclick = () => deleteEntry(d.id);
+                tda.appendChild(btn);
+                tr.appendChild(tda);
+
+                tb.appendChild(tr);
+            });
+        }
+
+        function drawChart() {
+            let cvs = document.getElementById('modelChart');
+            let ctx = cvs.getContext('2d');
+            cvs.width = cvs.parentElement.clientWidth;
+            cvs.height = 200;
+            let w = cvs.width, h = cvs.height;
+            ctx.clearRect(0, 0, w, h);
+
+            if (!D.length) return;
+            let maxLn = Math.log(Math.max(...D.map(d => d.rank)));
+            let minM = Math.max(0, D[0].marks - 10), maxM = Math.min(100, D[D.length - 1].marks + 10);
+
+            let mapX = (m) => ((m - minM) / (maxM - minM)) * w;
+            let mapY = (ln) => h - ((ln / maxLn) * h * 0.9);
+
+            // Grid
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 1;
+            for (let i = 0; i <= 10; i++) {
+                ctx.beginPath(); ctx.moveTo(i * w / 10, 0); ctx.lineTo(i * w / 10, h); ctx.stroke();
+            }
+
+            // Data points
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            D.forEach(d => {
+                ctx.beginPath(); ctx.arc(mapX(d.marks), mapY(Math.log(d.rank)), 2, 0, Math.PI * 2); ctx.fill();
+            });
+
+            // Hybrid Model Line
+            ctx.strokeStyle = 'var(--yellow)'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let m = minM; m <= maxM; m++) {
+                let x = mapX(m), y = mapY(predictLogRank(m));
+                if (m === minM) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        // --- PREDICTION EXECUTION ---
+
+        function getTier(r) {
+            if (r <= 100) return ['ELITE', 'var(--yellow)'];
+            if (r <= 500) return ['TOP TIER', 'var(--green)'];
+            if (r <= 1500) return ['STRONG', 'var(--blue)'];
+            if (r <= 5000) return ['MODERATE', 'white'];
+            if (r <= 15000) return ['DANGER', 'orange'];
+            return ['RETAKE', 'var(--red)'];
+        }
+
+        function executePrediction() {
+            if (D.length === 0) return alert("System Offline: Load Data First.");
+            let type = document.getElementById('inputType').value;
+            let val = parseFloat(document.getElementById('inputValue').value);
+            if (isNaN(val) || val < 0) return;
+
+            let m, s, r;
+            if (type === 'marks') {
+                m = Math.min(100, val);
+                s = predictScore(m);
+                r = Math.exp(predictLogRank(m));
+            } else if (type === 'score') {
+                s = Math.min(1000, val);
+                m = marksFromScore(s);
+                r = Math.exp(predictLogRank(m));
+            } else {
+                r = Math.max(1, val);
+                m = marksFromRank(r);
+                s = predictScore(m);
+            } // FIX: Restored closing brace for the else block.
+
+            // Calculate Bounds (Uncertainty) based on marks +/- 1.5
+            let mH = Math.min(100, m + 1.5), mL = Math.max(0, m - 1.5);
+            let sH = Math.min(1000, predictScore(mH)), sL = Math.max(0, predictScore(mL));
+            let rL = Math.exp(predictLogRank(mH));
+            let rH = Math.exp(predictLogRank(mL)); // High marks = Low rank
+
+            // Reset AI box on new prediction
+            document.getElementById('aiResult').classList.add('hidden');
+            document.getElementById('aiResult').innerHTML = '';
+            document.getElementById('aiBtn').disabled = false;
+
+            // Calculate Confidence
+            let minM = D[0].marks, maxM = D[D.length - 1].marks;
+            let knn = getKNN(m, 5);
+            let distScore = Math.max(0, 100 - (knn[0]?.dist * 20)); // close to data = good
+            let densityScore = Math.min(100, D.filter(d => Math.abs(d.marks - m) <= 2).length * 10);
+            let edgePen = (m < minM || m > maxM) ? 0.3 : 1.0;
+            let conf = Math.round((distScore * 0.5 + densityScore * 0.5) * edgePen);
+
+            // Update UI
+            document.getElementById('resultsArea').classList.remove('hidden');
+            safeText('resMarks', m.toFixed(2));
+            safeText('resScore', Math.round(s));
+            safeText('resScoreRng', `± ${Math.round(Math.abs(sH - s))}`);
+            safeText('resRank', Math.round(r));
+            safeText('resRankRng', `Expected Range: ${Math.round(rL)} to ${Math.round(rH)}`);
+
+            let t = getTier(r);
+            safeText('resVerdict', t[0]); document.getElementById('resVerdict').style.color = t[1];
+
+            safeText('confText', `Confidence Score: ${conf}% ` + (conf < 40 ? '(Extrapolated / Sparse Data)' : '(Strong Local Data)'));
+            let cb = document.getElementById('confBar');
+            cb.style.width = '0%'; setTimeout(() => cb.style.width = `${conf}%`, 50);
+            cb.style.background = conf > 70 ? 'var(--green)' : conf > 40 ? 'var(--yellow)' : 'var(--red)';
+
+            // NN UI
+            let nnUl = document.getElementById('nnList'); nnUl.innerHTML = '';
+            knn.slice(0, 3).forEach(n => {
+                let li = document.createElement('li');
+                li.innerHTML = `<span>AIR ${n.rank}</span> @ ${n.marks.toFixed(1)}m (dist: ${n.dist.toFixed(2)})`;
+                nnUl.appendChild(li);
+            });
+
+            // Offer Tally
+            let margin = Math.max(50, r * 0.2); // 20% rank window
+            let offers = D.filter(d => Math.abs(d.rank - r) <= margin && d.offer && d.offer.length > 3).map(d => d.offer.toLowerCase());
+            let clusters = { 'IIT': 0, 'IISc': 0, 'NIT': 0, 'IIIT': 0, 'PSU': 0 };
+            offers.forEach(o => {
+                if (o.includes('iit') && !o.includes('iiit')) clusters['IIT']++;
+                if (o.includes('iisc')) clusters['IISc']++;
+                if (o.includes('nit')) clusters['NIT']++;
+                if (o.includes('iiit')) clusters['IIIT']++;
+                if (o.includes('psu') || o.includes('ongc')) clusters['PSU']++;
+            });
+
+            let offUl = document.getElementById('offerList'); offUl.innerHTML = '';
+            let found = false;
+            Object.entries(clusters).sort((a, b) => b[1] - a[1]).forEach(([k, v]) => {
+                if (v > 0) {
+                    found = true;
+                    let li = document.createElement('li');
+                    let prob = Math.min(99, Math.round((v / Math.max(1, offers.length)) * 100));
+                    li.innerHTML = `<span>${k}</span> (~${prob}% historical freq)`;
+                    offUl.appendChild(li);
+                }
+            });
+            if (!found) {
+                let li = document.createElement('li'); li.textContent = 'No strong historical clusters found.';
+                offUl.appendChild(li);
+            }
+
+            drawChart();
+        }
+
+    </script>
+</body>
+
+</html>
