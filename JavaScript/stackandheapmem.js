@@ -23,4 +23,6 @@ userTwo.email = "usertwo@google.com"
 console.log(userOne.email);
 console.log(userTwo.email);
 
+// https://app.notion.com/p/Stack-and-Heap-Memory-387f7faf356b80089937f72b9a8b7c08
+
 
