@@ -58,6 +58,6 @@
 
 //----------------------------------------------------------------------
 
-// Write a function that takes an array as a parameter, destructures the first two elements into first and second, and logs them both.
+
 
 
