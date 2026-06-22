@@ -12,8 +12,15 @@ console.log(myWholeName);
 console.log(anotherName);
 
 let userOne = {
-  email: "user@google.com",
+  email: "userone@google.com",
   upi: "user@upi",
 };
 
-let userTwo = userOne
+let userTwo = userOne;
+
+userTwo.email = "usertwo@google.com"
+
+console.log(userOne.email);
+console.log(userTwo.email);
+
+
