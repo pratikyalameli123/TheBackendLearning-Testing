@@ -11,11 +11,19 @@ const jsUser = {
     lastLoginDay : ["Sat"]
 }
 
-console.log(jsUser.email);
-console.log(jsUser["email"]);
-console.log(jsUser[mySym]);
+// console.log(jsUser.email);
+// console.log(jsUser["email"]);
+// console.log(jsUser[mySym]);
 
 jsUser.email = "pratikyal@gmail.com"
-Object.freeze(jsUser) //once freze values don't change anymore
+// Object.freeze(jsUser) //FREEZE USE KARDIYA HAI TOH AAGE KA BHI NAHI LEGA VOH
 jsUser.email = "hitesh@gmail.com"
-console.log(jsUser);
+// console.log(jsUser);
+
+jsUser.greeting = function(){
+    console.log("Hello JavaScript User. This is greeting");
+}    
+
+console.log(jsUser.greeting());
+
+
