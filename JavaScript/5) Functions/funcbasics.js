@@ -1,63 +1,50 @@
 
 function sayMyName(){
-    console.log("H");
-    console.log("I");
+    console.log("P");
+    console.log("R");
+    console.log("A");
     console.log("T");
-    console.log("E");
-    console.log("S");
-    console.log("H");
+    console.log("I");
+    console.log("K");
 }
 
-// sayMyName()
-
-// function addTwoNumbers(number1, number2){
-
-//     console.log(number1 + number2);
-// }
 
 function addTwoNumbers(number1, number2){
     // let result = number1 + number2
-    // return result
+    // return result  //another way to return the result without storing it in a variable
     return number1 + number2
 }
 
 const result = addTwoNumbers(3, 5)
 
-// console.log("Result: ", result);
-
-
 function loginUserMessage(username = "sam"){
     if(!username){
-        console.log("PLease enter a username");
+        console.log("Please enter a username");
         return
     }
-    return `${username} just logged in`
+    return `${username} just logged in`  
+    //${username} ek template literal hai jo username ko string me convert karke return karega
 }
 
-// console.log(loginUserMessage("hitesh"))
-// console.log(loginUserMessage("hitesh"))
-
-
-function calculateCartPrice(val1, val2, ...num1){
+function calculateCartPrice(val1, val2, ...num1){  //yeh (val1, val2, ...num1) ka matlab hai ki val1 aur val2 ko alag se pass karenge aur baaki ke saare arguments ko num1 me store karenge as an array
     return num1
 }
-
 // console.log(calculateCartPrice(200, 400, 500, 2000))
 
 const user = {
-    username: "hitesh",
-    prices: 199
+    username: "pratik",
+    price: 199
 }
 
 function handleObject(anyobject){
-    console.log(`Username is ${anyobject.username} and price is ${anyobject.price}`);
+    console.log(`Username is ${anyobject.username} and price is ${anyobject.price}`); //iska matlab hai ki humne object ke andar ke properties ko access kiya aur unko string me convert karke return kiya
 }
 
 // handleObject(user)
 handleObject({
     username: "sam",
     price: 399
-})
+}) //yeh ek anonymous object hai jo directly function me pass kiya gaya hai
 
 const myNewArray = [200, 400, 100, 600]
 
