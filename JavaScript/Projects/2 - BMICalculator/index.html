@@ -5,26 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="../styles.css" />
     <title>BMI Calculator</title>
   </head>
   <body>
-    
-    <div class="container">
-      <h1>BMI Calculator</h1>
-      <form>
-        <p><label>Height in CM: </label><input type="text" id="height" /></p>
-        <p><label>Weight in KG: </label><input type="text" id="weight" /></p>
-        <button>Calculate</button>
-        <div id="results"></div>
-        <div id="weight-guide">
-          <h3>BMI Weight Guide</h3>
-          <p>Under Weight = Less than 18.6</p>
-          <p>Normal Range = 18.6 and 24.9</p>
-          <p>Overweight = Greater than 24.9</p>
+    <main class="container">
+      <header class="app-header">
+        <h1>BMI Calculator</h1>
+        <p class="subtitle">Check your Body Mass Index quickly and easily</p>
+      </header>
+
+      <!-- Feet to CM Quick Converter -->
+      <section class="converter-box" aria-label="Height Unit Converter">
+        <details>
+          <summary>Convert Height from Feet to CM</summary>
+          <div class="converter-content">
+            <div class="converter-fields">
+              <div class="field-group">
+                <label for="feet">Feet (ft)</label>
+                <input type="number" id="feet" placeholder="e.g. 5" min="0" step="1" />
+              </div>
+              <div class="field-group">
+                <label for="inches">Inches (in)</label>
+                <input type="number" id="inches" placeholder="e.g. 9" min="0" max="11.9" step="any" />
+              </div>
+            </div>
+            <button type="button" id="convert-btn" class="secondary-btn">Convert &amp; Fill Height</button>
+            <div id="convert-feedback" class="convert-feedback" aria-live="polite"></div>
+          </div>
+        </details>
+      </section>
+
+      <form id="bmi-form">
+        <div class="form-group">
+          <label for="height">Height</label>
+          <div class="input-wrapper">
+            <input type="number" id="height" placeholder="e.g. 175" min="1" step="any" required />
+            <span class="unit-tag">CM</span>
+          </div>
         </div>
+
+        <div class="form-group">
+          <label for="weight">Weight</label>
+          <div class="input-wrapper">
+            <input type="number" id="weight" placeholder="e.g. 70" min="1" step="any" required />
+            <span class="unit-tag">KG</span>
+          </div>
+        </div>
+
+        <button type="submit" id="calculate-btn" class="primary-btn">Calculate BMI</button>
       </form>
-    </div>
+
+      <div id="results" class="results-container" aria-live="polite"></div>
+
+      <section id="weight-guide" class="weight-guide">
+        <h3>BMI Weight Guide</h3>
+        <div class="guide-grid">
+          <div class="guide-item underweight">
+            <span class="guide-label">Underweight</span>
+            <span class="guide-value">&lt; 18.6</span>
+          </div>
+          <div class="guide-item normal">
+            <span class="guide-label">Normal Range</span>
+            <span class="guide-value">18.6 – 24.9</span>
+          </div>
+          <div class="guide-item overweight">
+            <span class="guide-label">Overweight</span>
+            <span class="guide-value">&gt; 24.9</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="bmical.js"></script>
   </body>
-  <script src="bmical.js"></script>
 </html>
